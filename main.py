@@ -1,5 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException
 from configurations import collection
+from bson.objectid import ObjectId
 
 from database.models import User
 from database.schemas import all_users
@@ -21,6 +22,18 @@ async def create_user(new_user: User):
     try:
         resp = collection.insert_one(dict(new_user))
         return {"status_code": 200, "id": str(resp.inserted_id)}
+    except Exception as e:
+        return HTTPException(status_code=500, detail=f"Some error ocurred {e}")
+
+@router.put("/{user_id}")
+async def update_user(user_id: str, update_User: User):
+    try:
+        id = ObjectId(user_id)
+        existing_doc = collection.find_one({"_id": id, "is_Registered":False})
+        if not existing_doc:
+            return HTTPException(status_code=500, detail=f"User does not exist")
+        resp = collection.update_one({"_id":id}, {"$set": dict(update_User)})
+        return {"status_code":200, "message":"Task updated successfully"}
     except Exception as e:
         return HTTPException(status_code=500, detail=f"Some error ocurred {e}")
 
