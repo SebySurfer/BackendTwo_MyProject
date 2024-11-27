@@ -6,6 +6,12 @@ def individual_User(user):
         "id": str(user["_id"]),
         "firstName": str(user["firstName"]),
         "lastName": str(user["lastName"]),
+        "gender": str(user["gender"]),
+        "atGender": str(user["atGender"]),
+        "instagram": str(user["instagram"]),
+        "questions": user.get("questions", ["", "", "", "", "", ""]),
+        "is_Registered": str(user["is_Registered"])
+
     }
 
 def all_users(users):
