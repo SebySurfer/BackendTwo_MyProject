@@ -39,7 +39,7 @@ async def create_user(new_user: User):
 async def update_user(user_id: str, update_User: User):
     try:
         id = ObjectId(user_id)
-        existing_doc = collection.find_one({"_id": id, "is_Registered":False})
+        existing_doc = collection.find_one({"_id": id})
         if not existing_doc:
             return HTTPException(status_code=500, detail=f"User does not exist")
         resp = collection.update_one({"_id":id}, {"$set": dict(update_User)})
