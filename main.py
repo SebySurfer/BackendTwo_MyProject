@@ -49,16 +49,17 @@ async def update_user(user_id: str, update_data: QuestionsUpdate):
         raise HTTPException(status_code=500, detail=f"Some error occurred: {e}")
 
 
-@router.delete("/{user_id")
+@router.delete("/{user_id}")
 async def delete_user(user_id: str):
     try:
         id = ObjectId(user_id)
         existing_doc = collection.find_one({"_id": id})
         if not existing_doc:
-            return HTTPException(status_code=500, detail=f"User does not exist")
-        resp = collection.delete_one({"_id": id})
-        return {"status_code": 200, "message": "Task deleted successfully"}
+            raise HTTPException(status_code=404, detail="User does not exist")
+        collection.delete_one({"_id": id})
+        return {"status_code": 200, "message": "User deleted successfully"}
     except Exception as e:
-        return HTTPException(status_code=500, detail=f"Some error ocurred {e}")
+        raise HTTPException(status_code=500, detail=f"Some error occurred: {e}")
+
 
 app.include_router(router)
