@@ -36,6 +36,7 @@ async def create_user(new_user: User):
     except Exception as e:
         return HTTPException(status_code=500, detail=f"Some error ocurred {e}")
 
+
 @router.put("/{user_id}")
 async def update_user(user_id: str, update_data: QuestionsUpdate):
     try:
@@ -43,10 +44,21 @@ async def update_user(user_id: str, update_data: QuestionsUpdate):
         existing_doc = collection.find_one({"_id": id})
         if not existing_doc:
             raise HTTPException(status_code=404, detail="User does not exist")
+
+        # Debug log for incoming data
+        print(f"Data received for update: {update_data.questions}")
+
+        # Update the database
         resp = collection.update_one({"_id": id}, {"$set": {"questions": update_data.questions}})
+        if resp.modified_count == 0:
+            print(f"No documents modified for user_id {user_id}")
+            raise HTTPException(status_code=500, detail="Failed to update user questions")
+
         return {"status_code": 200, "message": "Questions updated successfully"}
     except Exception as e:
+        print(f"Error during update: {e}")
         raise HTTPException(status_code=500, detail=f"Some error occurred: {e}")
+
 
 
 @router.delete("/{user_id}")
