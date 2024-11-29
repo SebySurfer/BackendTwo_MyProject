@@ -6,6 +6,7 @@ from bson.objectid import ObjectId
 
 from database.models import User
 from database.schemas import all_users
+from database.models import QuestionsUpdate
 
 app = FastAPI()
 
@@ -36,16 +37,16 @@ async def create_user(new_user: User):
         return HTTPException(status_code=500, detail=f"Some error ocurred {e}")
 
 @router.put("/{user_id}")
-async def update_user(user_id: str, update_User: User):
+async def update_user(user_id: str, update_data: QuestionsUpdate):
     try:
         id = ObjectId(user_id)
         existing_doc = collection.find_one({"_id": id})
         if not existing_doc:
-            return HTTPException(status_code=500, detail=f"User does not exist")
-        resp = collection.update_one({"_id":id}, {"$set": dict(update_User)})
-        return {"status_code":200, "message":"Task updated successfully"}
+            raise HTTPException(status_code=404, detail="User does not exist")
+        resp = collection.update_one({"_id": id}, {"$set": {"questions": update_data.questions}})
+        return {"status_code": 200, "message": "Questions updated successfully"}
     except Exception as e:
-        return HTTPException(status_code=500, detail=f"Some error ocurred {e}")
+        raise HTTPException(status_code=500, detail=f"Some error occurred: {e}")
 
 
 @router.delete("/{user_id")

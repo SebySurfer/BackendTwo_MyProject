@@ -10,3 +10,6 @@ class User(BaseModel):
     instagram: str
     questions: List[str] = []
     is_Registered: bool = False
+
+class QuestionsUpdate(BaseModel):
+    questions: List[str]
