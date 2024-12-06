@@ -5,7 +5,7 @@ from configurations import collection
 from bson.objectid import ObjectId
 
 from database.models import User
-from database.schemas import all_users
+from database.schemas import all_users, individual_User
 from database.models import QuestionsUpdate
 
 app = FastAPI()
@@ -27,6 +27,19 @@ router = APIRouter()
 async def get_all_users():
     data = collection.find() #If you pass a blank, it fetches anything, and if not, it will pass through that filter/criteria
     return all_users(data)
+
+
+@router.get("/{user_id}")
+async def get_user(user_id: str):
+    try:
+        id = ObjectId(user_id)
+        user = collection.find_one({"_id": id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return individual_User(user)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Some error occurred: {e}")
+
 
 @router.post("/")
 async def create_user(new_user: User):
